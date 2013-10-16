@@ -3,7 +3,7 @@ var define;
 
 (function () {
   
-  var modules = {};
+  var modules = [];
 
   // Resolve this modules dependencies, and then apply the factory
   // using an empty object as the modules, passing in the dependencies.
@@ -19,7 +19,7 @@ var define;
   
   function resolve(dependencies, cb) {
     async.map(dependencies, function (dependencyName, cb) {
-      var module = modules[dependencyName];
+      var module = _.find(modules, { name: dependencyName });
       
       if (module) {
         go(module, cb);
@@ -30,7 +30,7 @@ var define;
         script.setAttribute('src', dependencyName + '.js');
         document.head.appendChild(script);
         script.addEventListener('load', function (event) {
-          var module = modules[dependencyName];
+          var module = _.find(modules, { name: dependencyName });
           go(module, cb);
         });
       }
@@ -45,10 +45,11 @@ var define;
   
   define = function (name, dependencies, factory) {
     // Create the module object and register it
-    modules[name] = {
+    modules.push({
+      name: name,
       dependencies: dependencies,
       factory: factory
-    };
+    });
   };
 
 })();
