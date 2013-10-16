@@ -42,6 +42,8 @@ var define;
     // Because the load happens milliseconds after each module is
     // defined, we can shift an item from the queue and it will be
     // our match.
+    // TODO: this possibly breaks with multiple definitions in an anon
+    // file, and others?
     var module = _.first(queue, { name: undefined })[0];
     if (module) {
       module.name = moduleName
