@@ -3,10 +3,10 @@ var define;
 
 (function () {
   
-  var modules = [];
+  var queue = [];
 
-  // Resolve this modules dependencies, and then apply the factory
-  // using an empty object as the modules, passing in the dependencies.
+  // Resolve this module's dependencies, and then apply the factory
+  // using an empty object as the context, passing in the dependencies.
   function go(module, cb) {
     resolve(module.dependencies, function (error, resolvedDependencies) {
       cb(null, module.factory.apply({}, resolvedDependencies));
@@ -19,7 +19,7 @@ var define;
   
   function resolve(dependencies, cb) {
     async.map(dependencies, function (dependencyName, cb) {
-      var module = _.find(modules, { name: dependencyName });
+      var module = matchModule(dependencyName);
       
       if (module) {
         go(module, cb);
@@ -29,12 +29,23 @@ var define;
         var script = document.createElement('script');
         script.setAttribute('src', dependencyName + '.js');
         document.head.appendChild(script);
+        
         script.addEventListener('load', function (event) {
-          var module = _.find(modules, { name: dependencyName });
+          var module = matchModule(dependencyName);
           go(module, cb);
         });
       }
     }, cb);
+  }
+  
+  function matchModule(moduleName) {
+    var module = _.first(queue, { name: undefined })[0];
+    if (module) {
+      module.name = moduleName
+    } else {
+      module = _.find(queue, { name: moduleName });
+    }
+    return module;
   }
   
   require = function (dependencies, cb) {    
@@ -45,7 +56,7 @@ var define;
   
   define = function (name, dependencies, factory) {
     // Create the module object and register it
-    modules.push({
+    queue.push({
       name: name,
       dependencies: dependencies,
       factory: factory
