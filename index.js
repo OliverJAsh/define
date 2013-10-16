@@ -4,6 +4,14 @@ var define;
 (function () {
   
   var modules = {};
+
+  // Resolve this modules dependencies, and then apply the factory
+  // using an empty object as the modules, passing in the dependencies.
+  function go(module, cb) {
+    resolve(module.dependencies, function (error, resolvedDependencies) {
+      cb(null, module.factory.apply({}, resolvedDependencies));
+    });
+  }
   
   /**
    * Recursively resolve dependencies
@@ -13,11 +21,19 @@ var define;
     async.map(dependencies, function (dependencyName, cb) {
       var module = modules[dependencyName];
       
-      // Resolve this modules dependencies, and then apply the factory
-      // using an empty object as the modules, passing in the dependencies.
-      resolve(module.dependencies, function (error, resolvedDependencies) {
-        cb(null, module.factory.apply({}, resolvedDependencies));
-      });
+      if (module) {
+        go(module, cb);
+      } else {
+        // load the script file
+        // wait for it to be parsed, and thus be defined
+        var script = document.createElement('script');
+        script.setAttribute('src', dependencyName + '.js');
+        document.head.appendChild(script);
+        script.addEventListener('load', function (event) {
+          var module = modules[dependencyName];
+          go(module, cb);
+        });
+      }
     }, cb);
   }
   
@@ -40,21 +56,8 @@ var define;
 
 (function () {
   
-  define('module-1', [], function () {
-    return {
-      baz: 'bar'
-    };
-  });
-  
-  define('module-2', [ 'module-1' ], function (module1) {
-    console.log('module-1', module1);
-    return {
-      foo: 'bar'
-    };
-  });
-  
-  require([ 'module-2' ], function (module2) {
-    console.log('module-2', module2);
+  require([ 'module1' ], function (module1) {
+    console.log('module1', module1);
   });
   
 })();
