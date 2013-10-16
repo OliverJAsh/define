@@ -5,22 +5,27 @@ var define;
   
   var context = {};
 
+  /**
+   * Recursively resolve dependencies
+   */
   function resolve(dependencies) {
     return dependencies.map(function (dependencyName) {
       var module = context[dependencyName];
-      return module.cb.apply(this, resolve(module.dependencies));
+      // Resolve this modules dependencies, and then apply the factory
+      // using an empty object as the context, passing in the dependencies.
+      return module.factory.apply({}, resolve(module.dependencies));
     });
   }
   
   function require(dependencies, cb) {    
-    cb.apply(this, resolve(dependencies));
+    cb.apply({}, resolve(dependencies));
   }
   
-  function define(name, dependencies, cb) {
+  function define(name, dependencies, factory) {
     // Create the module object
     context[name] = {
       dependencies: dependencies,
-      cb: cb
+      factory: factory
     };
   }
   
