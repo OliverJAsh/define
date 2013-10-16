@@ -24,8 +24,8 @@ var define;
       if (module) {
         go(module, cb);
       } else {
-        // load the script file
-        // wait for it to be parsed, and thus be defined
+        // Load the script file, wait for it to be parsed, and thereby
+        // our module will be defined.
         var script = document.createElement('script');
         script.setAttribute('src', dependencyName + '.js');
         document.head.appendChild(script);
@@ -39,6 +39,9 @@ var define;
   }
   
   function matchModule(moduleName) {
+    // Because the load happens milliseconds after each module is
+    // defined, we can shift an item from the queue and it will be
+    // our match.
     var module = _.first(queue, { name: undefined })[0];
     if (module) {
       module.name = moduleName
