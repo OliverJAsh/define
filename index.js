@@ -22,7 +22,7 @@ var define;
   }
   
   define = function (name, dependencies, factory) {
-    // Create the module object
+    // Create the module object and register it
     modules[name] = {
       dependencies: dependencies,
       factory: factory
