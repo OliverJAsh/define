@@ -17,17 +17,22 @@ var define;
     });
   }
   
-  function require(dependencies, cb) {    
+  require = function (dependencies, cb) {    
     cb.apply({}, resolve(dependencies));
   }
   
-  function define(name, dependencies, factory) {
+  define = function (name, dependencies, factory) {
     // Create the module object
     context[name] = {
       dependencies: dependencies,
       factory: factory
     };
   }
+
+})();
+
+
+(function () {
   
   define('module-1', [], function () {
     return {
@@ -45,5 +50,5 @@ var define;
   require([ 'module-2' ], function (module2) {
     console.log('module-2', module2);
   });
-
+  
 })();
