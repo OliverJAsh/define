@@ -4,22 +4,28 @@ var define;
 (function () {
   
   var modules = {};
-
+  
   /**
    * Recursively resolve dependencies
    */
-  function resolve(dependencies) {
-    return dependencies.map(function (dependencyName) {
+  
+  function resolve(dependencies, cb) {
+    async.map(dependencies, function (dependencyName, cb) {
       var module = modules[dependencyName];
+      
       // Resolve this modules dependencies, and then apply the factory
       // using an empty object as the modules, passing in the dependencies.
-      return module.factory.apply({}, resolve(module.dependencies));
-    });
+      resolve(module.dependencies, function (error, resolvedDependencies) {
+        cb(null, module.factory.apply({}, resolvedDependencies));
+      });
+    }, cb);
   }
   
   require = function (dependencies, cb) {    
-    cb.apply({}, resolve(dependencies));
-  }
+    resolve(dependencies, function (error, resolvedDependencies) {
+      cb.apply({}, resolvedDependencies);
+    });
+  };
   
   define = function (name, dependencies, factory) {
     // Create the module object and register it
@@ -27,7 +33,7 @@ var define;
       dependencies: dependencies,
       factory: factory
     };
-  }
+  };
 
 })();
 
