@@ -1,0 +1,5 @@
+* replace async with promises
+* write tests
+* allow require/define to be called with various signatures
+* optimiser? simply concatenate?
+* paths, resolve bower, etc.

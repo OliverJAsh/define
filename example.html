@@ -6,6 +6,15 @@
 <body>
   <script src="bower_components/async/lib/async.js"></script>
   <script src="bower_components/lodash/dist/lodash.js"></script>
-  <script src="index.js"></script>
+  <script src="define.js"></script>
+  <script>
+    (function () {
+      
+      require([ 'example' ], function (example) {
+        console.log('example', example);
+      });
+      
+    })();
+  </script>
 </body>
 </html>

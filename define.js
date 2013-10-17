@@ -69,12 +69,3 @@ var define;
   };
 
 })();
-
-
-(function () {
-  
-  require([ 'module1' ], function (module1) {
-    console.log('module1', module1);
-  });
-  
-})();
